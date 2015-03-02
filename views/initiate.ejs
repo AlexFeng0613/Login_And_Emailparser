@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/js/bootstrap.min.js">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <style>
+
+        td{
+            max-width: 30vw;
+            word-wrap: break-word
+        }
+    </style>
+</head>
+<body style="margin: 0 auto; width: 90vw">
+
+    <h1 class="text-center">Result PAGE</h1>
+
+    <a class="btn btn-link btn-lg" href="/search">Back</a>
+    <!--<h2><%= connectionStatus.connection %></h2>-->
+
+    <table class="table table-hover table-bordered table-striped"
+           data-sort-name="From" data-sort-order="desc" data-pagination="true" data-height="20" style="width: 90%; margin: 1em auto">
+        <caption>
+            <td>
+                <h4>From</h4>
+            </td>
+            <td>
+                <h4>To</h4>
+            </td>
+            <td>
+                <h4>Subject</h4>
+            </td>
+        </caption>
+
+        <%for(var i = 0, len = results.length; i < len; i++){%>
+            <tr>
+                <td>
+                    <%= results[i]['from'] %>
+                </td>
+                <td>
+                    <%= results[i]['to'] %>
+                </td>
+                <td>
+                    <%= results[i]['subject'] %>
+                </td>
+            </tr>
+        <%}%>
+
+    </table>
+
+
+</body>
+</html>

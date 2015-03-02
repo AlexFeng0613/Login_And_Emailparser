@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        img{
+            display: block;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded',function(){
+            document.querySelector('input[type = "file"]').addEventListener('change',function(){
+                console.log(this);
+                console.log(this.files);
+                var files = this.files;
+                var div_uploads = document.getElementById('uploads');
+                console.log(files.length);
+
+                var promises = Array.prototype.map.call(files,function(file){
+                    return new Promise(function(resolve,reject){
+                        console.log('Name:' + file.name + ' , type:' + file.type + ' ,size:' + file.size);
+                        var filereader = new FileReader();
+                        filereader.dom_container = createDisplay(div_uploads,file.name);
+                        filereader.readAsDataURL(file);
+
+                        var formData = new FormData();
+                        formData.append('file',file);
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST','/upload');
+
+                        xhr.addEventListener('progress',function(e){
+                            if(e.lengthComputable){
+                                filereader.dom_container.firstElementChild.value = e.loaded / e.total * 100;
+                            }
+                        });
+
+                        xhr.addEventListener('load',function(e){
+                            filereader.dom_container.firstElementChild.value = e.loaded / e.total * 100;
+                        });
+
+                        xhr.addEventListener('readystatechange',function(e){
+                            if(xhr.readyState === 4){
+                                if(xhr.status === 200){
+                                    resolve(xhr.responseText);
+                                } else{
+                                    reject(xhr.statusText);
+                                }
+                            }
+                        });
+
+                        xhr.send(formData);
+                    });
+                });
+
+                Promise.all(promises);
+
+            });
+        });
+
+        function createDisplay(parent,filename){
+            var div_file = createElement('div','','file',parent);
+
+            var progress = createElement('progress','','',div_file,{
+                max:100,
+                value:0
+            });
+
+            var file = createElement('div',filename,'',div_file);
+            /*var img = createElement('img','','',div_file);*/
+            return div_file;
+        }
+
+        function createElement(type,innerHTML,className,parent,attrs){
+            var elememt = document.createElement(type);
+            elememt.innerHTML = innerHTML;
+            elememt.className = className;
+
+            if(typeof parent !== 'undefined'){
+                parent.appendChild(elememt);
+            }
+
+            if(typeof attrs !== 'undefined'){
+                for(var attr in attrs){
+                    elememt.setAttribute(attr,attrs[attr]);
+                }
+            }
+            return elememt;
+        }
+    </script>
+</head>
+<body>
+<div>
+    <code>
+        open base64 -in inputfile -out outputfile
+    </code>
+</div>
+
+<input type="file" multiple />
+
+<div id="uploads">
+
+</div>
+
+</body>
+</html>

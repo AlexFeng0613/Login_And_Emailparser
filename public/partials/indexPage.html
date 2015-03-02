@@ -1,0 +1,61 @@
+<div>
+    <p>{{info}}</p>
+    <h1>Login</h1>
+    <form name="login" method="post">
+        <input type="text" name="username" placeholder="Username" ng-model="user.username" required="">
+        <span ng-show="login.$submitted || login.username.$touched">
+            <span ng-show="login.username.$error.required">
+                <small>Email required!</small>
+            </span>
+            <span ng-show="user.username">
+                Input Email: {{user.username}}
+            </span>
+        </span>
+        <p></p>
+
+        <input type="password" name="password" placeholder="password" ng-model="user.password" required="">
+        <span ng-show="login.$submitted || login.password.$touched">
+            <span ng-show="login.password.$error.required">
+                <small>Password required!</small>
+            </span>
+        </span>
+        <p></p>
+
+        <input type="submit" value="Login" ng-click="signIn(user,login)" ng-disabled="!login.$valid">
+    </form>
+</div>
+
+<div>
+    <h1>Register</h1>
+    <form name="register" method="post">
+        <select name="type" ng-model="newUser.type" required="">
+            <option value="admin">admin</option>
+            <option value="personnel">personnel</option>
+        </select>
+        <br>
+        <br>
+
+        <input type="text" placeholder='Username' ng-model="newUser.username" name="username" required="" username>
+        <span ng-show="register.$submitted || register.username.$touched">
+            <span ng-show="register.username.$error.required">
+                <small>Tell us your email</small>
+            </span>
+            <span ng-show="newUser.username">
+                Input Email: {{newUser.username}}
+            </span>
+        </span>
+        <br>
+        <br>
+
+        <input type="password" placeholder=password ng-model="newUser.password" name="password" required="">
+        <span ng-show="register.$submitted || register.password.$touched">
+            <span ng-show="register.password.$error.required">
+                <small>Input password</small>
+            </span>
+        </span>
+        <br>
+        <br>
+        <input type="button" value="reset" ng-click="reset(register)">
+        <input type="submit" value="register" ng-click="addUser(newUser)" ng-disabled="!register.$valid">
+    </form>
+</div>

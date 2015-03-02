@@ -1,0 +1,71 @@
+
+<form name="form" method="post" action="/query" class="form-horizontal" role="form" novalidate>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Imap server</label>
+        <div class="col-sm-5">
+            <input type="text" ng-model="server" placeholder="imap server address" name="host" class="form-control"
+                   require>
+        </div>
+      <span ng-show="form.$submitted || form.host.$touched">
+        <label ng-show="form.host.$error.require" class="control-label error">Required</label>
+      </span>
+
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Imap port</label>
+        <div class="col-sm-5">
+            <input type="text" ng-model="port" placeholder="imap server port number" name="port" class="form-control" require>
+        </div>
+      <span ng-show="form.$submitted || form.port.$touched">
+        <label ng-show="form.port.$error.require" class="control-label error">Required</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Email</label>
+        <div class="col-sm-5">
+            <input type="email" ng-model="email" placeholder="email@example.com" name="address" require class="form-control">
+        </div>
+      <span ng-show="form.$submitted || form.address.$touched">
+        <label ng-show="form.address.$error.require" class="control-label error">Required</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Email password</label>
+        <div class="col-sm-5">
+            <input type="password" ng-model="password" placeholder="password" name="password" class="form-control" require>
+        </div>
+      <span ng-show="form.$submitted || form.password.$touched">
+        <label ng-show="form.password.$error.require" class="control-label error">Required</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Start date</label>
+        <div class="col-sm-5">
+            <input data-provide="datepicker" ng-model="sdate" require id="startDate" placeholder="start date" name="sdate" class="form-control">
+        </div>
+      <span ng-show="form.$submitted || form.sdate.$touched">
+        <label ng-show="form.sdate.$error.require" class="control-label error">Required</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">End date</label>
+        <div class="col-sm-5">
+            <input data-provide="datepicker" ng-model="edate" require id="endDate" placeholder="end date" name="edate" class="form-control">
+        </div>
+      <span ng-show="form.$submitted || form.edate.$touched">
+        <label ng-show="form.edate.$error.require" class="control-label error">Required</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input type="submit" value="Submit!" class="btn btn-default" ng-disabled="!form.$valid">
+        </div>
+    </div>
+</form>

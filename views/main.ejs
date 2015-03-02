@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/js/bootstrap.min.js">
+    <link rel="stylesheet" type="text/css" href="bower_components/angular-bootstrap-datepicker/dist/angular-bootstrap-datepicker.css" />
+    <link rel="stylesheet" type="text/css" href="mainCSS.css">
+    <script>
+
+        angular.module('myApp',['ngRoute', 'ngAnimate']).config(function($routeProvider){
+
+            $routeProvider.when('/',{
+                templateUrl:'partials/indexPage.html',
+                controller:'indexController'
+            }).when('/home',{
+                templateUrl:'partials/homePage.html',
+                controller:'homeController'
+            }).when('/upload',{
+                controller:'uploadController',
+                templateUrl:'partials/uploadPage.html'
+            }).when('/search',{
+                //controller:'emailController',
+                templateUrl:'partials/emailSearchPage.html'
+            }).otherwise({
+                redirectTo: '/'
+            });
+
+        }).config(function($httpProvider){
+
+            $httpProvider.interceptors.push('myInterceptor');
+            $httpProvider.interceptors.push('loadingStatusInterceptor');
+
+        }).factory('myInterceptor',function(){
+            return {
+                request: function(config) {
+                    config.requestTimestamp = new Date().getTime();
+                    return config;
+                },
+                response: function(response) {
+                    //console.log(response.data.username);
+                    response.config.responseTimestamp = new Date().getTime();
+                    return response;
+                }
+            };
+        }).factory('loadingStatusInterceptor', function($q, $rootScope) {
+
+            var activeRequests = 0;
+            var started = function() {
+                if(activeRequests == 0) {
+                    $rootScope.$broadcast('loadingStatusActive');
+                }
+                activeRequests++;
+            };
+            var ended = function() {
+                activeRequests--;
+                if(activeRequests==0) {
+                    $rootScope.$broadcast('loadingStatusInactive');
+                }
+            };
+
+            return {
+                request: function(config) {
+                    started();
+                    return config;
+                },
+                response: function(response) {
+                    ended();
+                    return response;
+                },
+                responseError: function(rejection) {
+                    //console.log(rejection);
+                    ended();
+                    return $q.reject(rejection);
+                }
+            };
+        }).factory('HTTP',function($q,$http,$location){
+            return{
+
+                validate:function(){
+                    var defered = $q.defer();
+                    $http.get('validate').then(function(response){
+                        //var time = response.config.responseTimestamp - response.config.requestTimestamp;
+                        defered.resolve(response);
+                        //console.log('The request took ' + (time / 1000) + ' seconds.');
+                    });
+                    return defered.promise;
+                },
+
+                login:function(user){
+
+                    var defered = $q.defer();
+                    $http.post('login',{username:user.username,password:user.password}).success(function (data) {
+                        defered.resolve({
+                            status:data.status,
+                            user:data.currentUser
+                        });
+                    }).error(function(msg,status,headers,config){
+                        if(status === 401) {
+                            defered.resolve({status: '401', user: 'UNDEFINED'});
+                        }
+                        else {
+                            defered.reject({status: 'OTHERS', user: 'UNDEFINED2'});
+                        }
+                    });
+
+                    return defered.promise;
+
+                },
+                register:function(user){
+
+                    var defered = $q.defer();
+                    $http.post('register',{username:user.username,password:user.password,type:user.type}).success(function (data) {
+                        defered.resolve(data);
+                        //console.log(data);
+                    }).error(function(msg){
+                        defered.reject(meg);
+                    });
+
+                    return defered.promise;
+                },
+                logout:function(){
+                    $http.get('logout').then(function(response){
+                        console.log(response);
+                    });
+                }
+            }
+        }).controller('indexController',function($location,$scope,HTTP,$window,$rootScope){
+            HTTP.validate().then(function(response){
+                if(response.data){
+                    $rootScope.currentUser = response.data;
+                    //console.log($rootScope.currentUser);
+                    $location.path('/home');
+                    //$window.open('/search');
+                }
+            });
+
+            $scope.reset = function(form){
+                if(form){
+                    form.$setPristine();
+                    form.$setUntouched();
+                    $scope.newUser.type = "";
+                    $scope.newUser.username = "";
+                    $scope.newUser.password = "";
+                }
+            };
+
+            $scope.addUser = function(user){
+                HTTP.register(user).then(function(data){
+                    //console.log(data);
+                    $scope.info = 'Register Success';
+                    $location.path('/');
+                });
+            };
+
+            $scope.signIn = function(user,form){
+
+                HTTP.login(user).then(function(data){
+                    if(data.status === 'LOGIN POST SUCCESS!'){
+                        $scope.info = undefined;
+                        console.log(data);
+                        $rootScope.currentUser = data.user;
+                        $location.path('/home');
+                    }
+                    else{
+                        $scope.info = 'Invalid username or password';
+                        form.$setPristine();
+                        form.$setUntouched();
+                        $scope.user.username = '';
+                        $scope.user.password = '';
+                    }
+                });
+            };
+        }).controller('homeController',function(HTTP,$location,$scope,$rootScope){
+            HTTP.validate().then(function(response){
+                //console.log(response);
+                $rootScope.currentUser = response.data;
+                //console.log($rootScope.currentUser);
+                if(!response.data)   $location.path('/');
+                else $scope.user = response.data;
+            });
+
+        }).controller('uploadController',function($http,$scope,HTTP,$location,$rootScope){
+            HTTP.validate().then(function(response){
+                $rootScope.currentUser = response.data;
+                if(!response.data)   $location.path('/');
+                else    $scope.user = response.data;
+            });
+
+            $scope.uploadTo = function(){
+                $http.get('/uploadTo').success(function(data){
+                    console.log(data);
+                });
+            };
+
+        }).directive('fileUpload',function(){
+            return{
+                link:function (scope, element, attrs) {
+                    element[0].addEventListener('change',function(e){
+                        console.log(attrs.id);
+                        console.log(this.files);
+                        var files = this.files;
+
+                        var div_uploads = document.getElementById('uploaded_' + attrs.id);
+                        console.log(files.length);
+
+                        var promises = Array.prototype.map.call(files,function(file){
+                            return new Promise(function(resolve,reject){
+                                console.log('Name:' + file.name + ' , type:' + file.type + ' ,size:' + file.size);
+                                var filereader = new FileReader();
+                                filereader.dom_container = createDisplay(div_uploads,file.name);
+                                filereader.readAsDataURL(file);
+
+                                var formData = new FormData();
+                                formData.append('file',file);
+
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('POST','/uploadTo');
+
+                                xhr.addEventListener('progress',function(e){
+                                    if(e.lengthComputable){
+                                        filereader.dom_container.firstElementChild.value = e.loaded / e.total * 100;
+                                    }
+                                });
+
+                                xhr.addEventListener('load',function(e){
+                                    filereader.dom_container.firstElementChild.value = e.loaded / e.total * 100;
+                                });
+
+                                xhr.addEventListener('readystatechange',function(e){
+                                    if(xhr.readyState === 4){
+                                        if(xhr.status === 200){
+                                            resolve(xhr.responseText);
+                                        } else{
+                                            reject(xhr.statusText);
+                                        }
+                                    }
+                                });
+
+                                xhr.send(formData);
+                            });
+                        });
+
+                        Promise.all(promises);
+                    });
+                }
+            }
+        }).directive('loadingStatusMessage', function() {
+            return {
+                link: function($scope, element, attrs) {
+
+                    var show = function() {
+                        element.css('display', 'block');
+                    };
+                    var hide = function() {
+                        element.css('display', 'none');
+                    };
+                    $scope.$on('loadingStatusActive', show);
+                    $scope.$on('loadingStatusInactive', hide);
+                    hide();
+                }
+            };
+        });
+
+        function createDisplay(parent,filename){
+            var div_file = createElement('div','','file',parent);
+
+            var progress = createElement('progress','','',div_file,{
+                max:100,
+                value:0
+            });
+
+            var file = createElement('div',filename,'',div_file);
+            /*var img = createElement('img','','',div_file);*/
+            return div_file;
+        }
+
+        function createElement(type,innerHTML,className,parent,attrs){
+            var elememt = document.createElement(type);
+            elememt.innerHTML = innerHTML;
+            elememt.className = className;
+
+            if(typeof parent !== 'undefined'){
+                parent.appendChild(elememt);
+            }
+
+            if(typeof attrs !== 'undefined'){
+                for(var attr in attrs){
+                    elememt.setAttribute(attr,attrs[attr]);
+                }
+            }
+            return elememt;
+        }
+    </script>
+</head>
+<body>
+    <header ng-show="currentUser">
+        <nav class="navbar navbar-inverse">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#/">Email Receiver</a>
+                </div>
+
+                <div id="navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#/">Home</a></li>
+                        <li><a href="/#/upload">Upload resume</a></li>
+                        <li><a href="#about">Send email</a></li>
+                        <li><a href="#/search">Search Email</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <article>
+        <div id="loader-wrapper" loading-status-message  style="position:fixed; display:none;">
+            <div id="loader"></div>
+        </div>
+        <div class="view-animate-container">
+            <div ng-view="" class="view-animate"></div>
+        </div>
+    </article>
+
+    <footer>
+        <nav class="navbar navbar-default" name="contact">
+            <span class="left">
+                <a>Advertising</a>
+                <a>Business</a>
+                <a>About</a>
+            </span>
+            <span class="right">
+                <a>Privacy</a>
+                <a>Terms</a>
+            </span>
+
+        </nav>
+    </footer>
+</body>
+</html>

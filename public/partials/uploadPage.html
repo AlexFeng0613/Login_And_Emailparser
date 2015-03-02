@@ -1,0 +1,36 @@
+<div ng-show="user">
+    <style>
+        img{
+            display: block;
+        }
+    </style>
+    <!--<div>
+        <a href="#/home">{{user}}'s Home Page</a>
+    </div>-->
+    <div>
+        <code>
+            open base64 -in inputfile -out outputfile
+        </code>
+    </div>
+    <section>
+        <label class="label label-primary">Upload Resume</label>
+        <input type="file" multiple id="resume" file-upload/>
+
+        <div id="uploaded_resume">
+
+        </div>
+    </section>
+
+    <section>
+        <label class="label label-info">Upload Image</label>
+        <input type="file" multiple id="image" file-upload/>
+
+        <div id="uploaded_image">
+
+        </div>
+    </section>
+
+    <section>
+        <button id="clicks">CLICK!</button>
+    </section>
+</div>

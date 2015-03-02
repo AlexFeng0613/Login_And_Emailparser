@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body{
+            background-color: #480f3a;
+        }
+        /* Method 1*/
+        /*.pagination {
+            width: 293px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .pagination li {
+            line-height: 25px;
+            display: inline;
+            float: left;
+            margin: 0 5px;
+        }
+        .pagination a {
+            display: block;
+            color: #f2f2f2;
+            text-shadow: 1px 0 0 #101011;
+            padding: 0 10px;
+            border-radius: 2px;
+            box-shadow: 0 1px 0 #5a5b5c inset,0 1px 0 #080808;
+            background: linear-gradient(#434345,#2f3032);
+        }
+        .pagination a:hover {
+            text-decoration: none;
+            box-shadow: 0 1px 0 #f9bd71 inset,0 1px 0 #0a0a0a;
+            background: linear-gradient(#f48b03,#c87100);
+        }*/
+
+        /* Method 2*/
+        .pagination {
+            text-align: center;
+            font-size: 0;
+            letter-spacing: -4px;
+            word-spacing: -4px;
+        }
+        .pagination li {
+            line-height: 25px;
+            margin: 0 5px;
+            display: inline-block;
+            zoom:1;
+            letter-spacing: normal;
+            word-spacing: normal;
+            font-size: 12px;
+        }
+        .pagination a {
+            display: block;
+            color: #f2f2f2;
+            text-shadow: 1px 0 0 #101011;
+            padding: 0 10px;
+            border-radius: 2px;
+            box-shadow: 0 1px 0 #5a5b5c inset,0 1px 0 #080808;
+            background: linear-gradient(#434345,#2f3032);
+        }
+        .pagination a:hover {
+            text-decoration: none;
+            box-shadow: 0 1px 0 #f9bd71 inset,0 1px 0 #0a0a0a;
+            background: linear-gradient(#f48b03,#c87100);
+        }
+
+        *{
+            margin:0px;
+            padding:0px;
+        }
+        #first{
+            float:left;
+            margin-left:-310px;
+            width:100px;
+            height:150px;
+            background:#f33;
+        }
+        #second{
+            float:left;
+            margin-left:-310px;
+            margin-top:160px;
+            width:100px;
+            height:150px;
+            background:#ff0;
+        }
+        div.container{
+            float:left;
+        }
+        #third{
+            margin-left:110px;
+            width:200px;
+            height:310px;
+            background:#CC0000;
+        }
+    </style>
+    <script>
+        function compare2(str1,str2){
+            if(str1.length !== str2.length){
+                return false;
+            }
+
+            var arr1 = new Array(26), arr2 = new Array(26);
+        }
+
+        function getHash2(str){
+            var arr = [];
+            for(var i = 0; i < 26;i++){
+
+            }
+        }
+
+        function compare(str1,str2){
+            var ob1 = {},ob2={};
+            ob1 = getHash(str1);
+            ob2 = getHash(str2);
+
+            for(var prop in ob1){
+                if(ob2[prop] && ob2[prop] === ob1[prop])    continue;
+                else return false;
+            }
+
+            for(var prop in ob2){
+                if(ob1[prop] && ob2[prop] === ob1[prop])    continue;
+                else return false;
+            }
+
+            return true;
+        }
+
+        function getHash(str){
+            var obj = {};
+            for(var i = 0 ; i < str.length;i++){
+                if(!obj[str.charAt(i)]){
+                    obj[str.charAt(i)] = 1;
+                }else{
+                    obj[str.charAt(i)] ++;
+                }
+            }
+            return obj;
+        }
+
+        console.log(compare('dot','tod'));
+    </script>
+</head>
+<body>
+    <div class="pagination">
+        <ul>
+            <li><a href="#">Prev</a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#">Next</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div id="third">third</div>
+    </div>
+    <div id="second">second</div>
+    <div id="first">first</div>
+</body>
+</html>
